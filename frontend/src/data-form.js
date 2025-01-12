@@ -1,18 +1,15 @@
-import { useState } from 'react';
-import {
-    Box,
-    TextField,
-    Button,
-} from '@mui/material';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
+import DataTable from './item-card';
 
 const endpointMapping = {
     'Notion': 'notion',
     'Airtable': 'airtable',
+    'Hubspot': 'hubspot',
 };
 
 export const DataForm = ({ integrationType, credentials }) => {
-    const [loadedData, setLoadedData] = useState(null);
+    const [loadedData, setLoadedData] = useState([]);
     const endpoint = endpointMapping[integrationType];
 
     const handleLoad = async () => {
@@ -27,31 +24,35 @@ export const DataForm = ({ integrationType, credentials }) => {
         }
     }
 
+    useEffect(() => {
+        console.log(loadedData)
+    }, [loadedData])
+
     return (
-        <Box display='flex' justifyContent='center' alignItems='center' flexDirection='column' width='100%'>
-            <Box display='flex' flexDirection='column' width='100%'>
-                <TextField
-                    label="Loaded Data"
-                    value={loadedData || ''}
-                    sx={{mt: 2}}
-                    InputLabelProps={{ shrink: true }}
-                    disabled
-                />
-                <Button
-                    onClick={handleLoad}
-                    sx={{mt: 2}}
-                    variant='contained'
-                >
-                    Load Data
-                </Button>
-                <Button
-                    onClick={() => setLoadedData(null)}
-                    sx={{mt: 1}}
-                    variant='contained'
-                >
-                    Clear Data
-                </Button>
-            </Box>
-        </Box>
+        <div className="container">
+            <div className="content">
+                <div className="header">
+                    <h1>Integration Data Viewer</h1>
+                    <p>View and manage your integration data</p>
+                </div>
+
+                <div className="button-group">
+                    <button onClick={handleLoad} className="button button-primary">
+                        Load Demo Data
+                    </button>
+                    <button onClick={() => setLoadedData([])} className="button button-secondary">
+                        Clear Data
+                    </button>
+                </div>
+
+                {loadedData.length > 0 ? (
+                    <DataTable data={loadedData} />
+                ) : (
+                    <div className="empty-state">
+                        <p>No data loaded. Click "Load Demo Data" to see an example.</p>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
